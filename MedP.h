@@ -19,7 +19,7 @@ class Media: public MedP{
     private:
         std::vector<std::string> counters;
         std::vector<int> counts;
-        enum Status{
+        enum class Status{
             Ongoing,
             Interested,
             Finished,

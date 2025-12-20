@@ -26,15 +26,14 @@ Media::~Media(){
 }
 
 std::string Media::print(){
-    std::string result;
-    result+="("+this->title+"){";
-    for(int i=0;i<this->counts.size();i++){
-        result+=this->counts[i];
-        if(i!=this->counts.size()-1){
-            result+=",";
+    std::string result = "(" + this->title + "){";
+    for (size_t i = 0; i < this->counts.size(); ++i) {
+        result += std::to_string(this->counts[i]);
+        if (i != this->counts.size() - 1) {
+            result += ",";
         }
     }
-    result+="}";
+    result += "}";
     return result;
 }
 
@@ -62,7 +61,7 @@ void Media::changeStatus(std::string text){
 std::string Media::view(){
     std::string result;
     result+="Title: "+this->title+"\n";
-    result+="\tStatus: "+std::to_string(this->status)+"\n";
+    result+="\tStatus: "+std::to_string(static_cast<int>(this->status))+"\n";
     for(int i=0;i<this->counters.size();i++){
         result+=this->counters[i]+": "+std::to_string(this->counts[i])+"\n";
     }
