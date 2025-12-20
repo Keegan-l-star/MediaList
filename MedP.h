@@ -10,7 +10,7 @@ class MedP{
         std::string title;
     public:
         MedP(std::string title);
-        void add(MedP* Me);
+        virtual void add(MedP* Me);
         virtual MedP* getChild(std::string text);
         virtual std::string print()=0;
 };
@@ -19,13 +19,14 @@ class Media: public MedP{
     private:
         std::vector<std::string> counters;
         std::vector<int> counts;
-        enum status{
+        enum Status{
             Ongoing,
             Interested,
             Finished,
             Dropped,
             Ended
         };
+        Status status;
     public:
         Media(std::vector<std::string> counters, std::string title);
         Media(std::string title);
@@ -43,13 +44,15 @@ class Category: public MedP{
     private:
         std::vector<MedP*> group;
         std::vector<std::string> measures;
+        std::string symbol;
     public:
-        Category(std::string title);
+        Category(std::string title, std::string symbol, std::vector<std::string> measures);
         ~Category();
         void add(MedP* Me);
         void add(std::string Me);
         MedP* getChild(std::string text);
         std::string print();
+        std::string view();
 };
 
 #endif
