@@ -14,12 +14,18 @@ MedP* MedP::getChild(std::string text){
     return nullptr;
 }
 
+MedP* MedP::cat(std::string text){
+    return nullptr;
+}
+
 Media::Media(std::vector<std::string> counters, std::string title): MedP(title){
     this->counters = counters;
     this->counts = std::vector<int>(counters.size(), 1);
+    this->status = Status::Interested;
 }
 
 Media::Media(std::string title): MedP(title){
+    this->status = Status::Interested;
 }
 
 Media::~Media(){
@@ -33,7 +39,7 @@ std::string Media::print(){
             result += ",";
         }
     }
-    result += "}";
+    result += "}\\\\" + statusText();
     return result;
 }
 
@@ -61,11 +67,22 @@ void Media::changeStatus(std::string text){
 std::string Media::view(){
     std::string result;
     result+="Title: "+this->title+"\n";
-    result+="\tStatus: "+std::to_string(static_cast<int>(this->status))+"\n";
+    result+="\tStatus: "+statusText()+"\n";
     for(int i=0;i<this->counters.size();i++){
         result+=this->counters[i]+": "+std::to_string(this->counts[i])+"\n";
     }
     return result;
+}
+
+std::string Media::statusText() const{
+    switch(this->status){
+        case Status::Ongoing:    return "Ongoing";
+        case Status::Interested: return "Interested";
+        case Status::Finished:   return "Finished";
+        case Status::Dropped:    return "Dropped";
+        case Status::Ended:      return "Ended";
+        default:                 return "Unknown";
+    }
 }
 
 void Media::addCount(){
@@ -146,15 +163,21 @@ std::string Category::print(){
             result+=",";
         }
     }
-    result+="}]";
+    result+="}]\n";
     return result;
 }
 
 std::string Category::view(){
     std::string result;
     for(int i=0;i<group.size();i++){
-        result+="<"+this->symbol+">"+group[i]->print();
+        result+="<"+this->symbol+">"+group[i]->print()+"\n";
     }
     return result;
 }
 
+Category* Category::cat(std::string text){
+    if(this->title == text){
+        return this;
+    }
+    return nullptr;
+}

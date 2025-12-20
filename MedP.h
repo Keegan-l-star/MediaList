@@ -13,6 +13,8 @@ class MedP{
         virtual void add(MedP* Me);
         virtual MedP* getChild(std::string text);
         virtual std::string print()=0;
+        virtual std::string view()=0;
+        virtual MedP* cat(std::string text);
 };
 
 class Media: public MedP{
@@ -27,6 +29,7 @@ class Media: public MedP{
             Ended
         };
         Status status;
+        std::string statusText() const;
     public:
         Media(std::vector<std::string> counters, std::string title);
         Media(std::string title);
@@ -38,6 +41,9 @@ class Media: public MedP{
         void addCount(int index, int count);
         void addCounters(std::vector<std::string> text);
         void addCounters();
+        std::string getTitle(){
+            return title;
+        }
 };
 
 class Category: public MedP{
@@ -53,6 +59,13 @@ class Category: public MedP{
         MedP* getChild(std::string text);
         std::string print();
         std::string view();
+        Category* cat(std::string text);
+        std::vector<std::string> getMeasures(){
+            return measures;
+        };
+        std::string getSymbol(){
+            return symbol;  
+        }
 };
 
 #endif
