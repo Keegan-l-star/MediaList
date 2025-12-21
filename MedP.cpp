@@ -94,7 +94,7 @@ void Media::addCount(int index, int count){
         std::cout<<"Invalid Index"<<std::endl;
         return;
     }
-    this->counts[index]+=count;
+    this->counts[index]=count;
 }
 
 void Media::addCounters(std::vector<std::string> text){

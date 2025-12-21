@@ -41,4 +41,4 @@ gdb: $(TARGET)
 	gdb ./$(TARGET)
 
 clean:
-	rm -f *.o $(TARGET) core* vgcore*
+	rm -f *.o *.txt $(TARGET) core* vgcore*

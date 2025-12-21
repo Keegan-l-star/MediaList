@@ -66,6 +66,9 @@ class Category: public MedP{
         std::string getSymbol(){
             return symbol;  
         }
+        std::string getTitle(){
+            return title;
+        }
 };
 
 #endif
