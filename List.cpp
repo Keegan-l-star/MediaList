@@ -8,6 +8,8 @@
 
 using namespace std;
 
+Repo* repo=nullptr;
+
 void clearScreen() {
     cout << "\033[2J\033[1;1H";
 }
@@ -30,16 +32,17 @@ void printMenu() {
 }
 
 void waitForEnter() {
-    cout << "\nPress Enter to continue...";
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cout << "\nGoing back to main menu. Press any key to continue...";
     cin.get();
+    cin.clear();
+    return;
 }
 
-void viewAllMedia(Doc& doc) {
+void viewAllMedia() {
     clearScreen();
     printHeader();
     cout << "\n--- All Media ---\n" << endl;
-    string content = doc.getRepo()->print();
+    string content = repo->view();
     if (content.empty()) {
         cout << "No media found. Add some categories and media first!" << endl;
     } else {
@@ -48,53 +51,67 @@ void viewAllMedia(Doc& doc) {
     waitForEnter();
 }
 
-void addCategory(Doc& doc) {
+void addCategory() {
     clearScreen();
     printHeader();
-    cout << "\n--- Add New Category ---\n" << endl;
+    do{
+        cout << "\n--- Add New Category ---\n" << endl;
 
-    string title, symbol;
-    vector<string> measures;
-    string measure;
+        string title, symbol;
+        vector<string> measures;
+        string measure;
 
-    cout << "Enter category name (e.g., Anime, Movie, Manga): ";
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    getline(cin, title);
-
-    cout << "Enter symbol for this category (single character, e.g., @, #, +, *): ";
-    getline(cin, symbol);
-
-    cout << "Enter measures/counters for this category." << endl;
-    cout << "(e.g., Episodes, Seasons, Chapters, Pages)" << endl;
-    cout << "Enter each measure and press Enter. Type 'done' when finished:" << endl;
-
-    while (true) {
-        cout << "  Measure " << measures.size() + 1 << ": ";
-        getline(cin, measure);
-        if (measure == "done" || measure == "Done" || measure == "DONE") {
-            break;
+        cout << "Enter category name (e.g., Anime, Movie, Manga) or press tab to cancel: ";
+        cin.clear();
+        getline(cin, title);
+        if (title=="\t") {
+            cout << "\nCategory addition cancelled." << endl;
+            waitForEnter();
+            return;
         }
-        if (!measure.empty()) {
-            measures.push_back(measure);
+
+        cout << "Enter symbol for this category (single character, e.g., @, #, +, *): ";
+        getline(cin, symbol);
+
+        cout << "Enter measures/counters for this category." << endl;
+        cout << "(e.g., Episodes, Seasons, Chapters, Pages)" << endl;
+        cout << "Enter each measure and press Enter. Type 'done' when finished:" << endl;
+
+        while (true) {
+            cout << "  Measure " << measures.size() + 1 << ": ";
+            getline(cin, measure);
+            if (measure == "done" || measure == "Done" || measure == "DONE") {
+                break;
+            }
+            if (!measure.empty()) {
+                measures.push_back(measure);
+            }
         }
-    }
 
-    if (measures.empty()) {
-        cout << "\nError: You must add at least one measure!" << endl;
-        waitForEnter();
-        return;
-    }
+        if (measures.empty()) {
+            cout << "\nError: You must add at least one measure!" << endl;
+            waitForEnter();
+            return;
+        }
 
-    Category* cat = doc.getRepo()->addTheme(title, symbol, measures);
-    if (cat != nullptr) {
-        cout << "\nCategory '" << title << "' added successfully!" << endl;
-    } else {
-        cout << "\nFailed to add category. Title or symbol may already exist." << endl;
-    }
-    waitForEnter();
+        Category* cat = repo->addTheme(title, symbol, measures);
+        if (cat != nullptr) {
+            cout << "\nCategory '" << title << "' added successfully!" << endl;
+            return;
+        } else {
+            cout << "\nFailed to add category. Title or symbol may already exist. Try again or press 1 to cancel." << endl;
+            string retry;
+            cout << "Enter your choice: ";
+            getline(cin, retry);
+            if (retry == "1") {
+                cout << "\nCategory addition cancelled." << endl;
+                return;
+            }
+        }
+    } while(true);
 }
 
-void addMedia(Doc& doc) {
+void addMedia() {
     clearScreen();
     printHeader();
     cout << "\n--- Add New Media ---\n" << endl;
@@ -102,10 +119,10 @@ void addMedia(Doc& doc) {
     string theme, title, status;
 
     cout << "Enter the category/theme name (e.g., Anime, Movie): ";
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.clear();
     getline(cin, theme);
 
-    Category* cat = doc.getRepo()->getTheme(theme);
+    Category* cat = repo->getTheme(theme);
     if (cat == nullptr) {
         cout << "\nCategory '" << theme << "' not found!" << endl;
         cout << "Please add the category first." << endl;
@@ -117,13 +134,31 @@ void addMedia(Doc& doc) {
     getline(cin, title);
 
     cout << "\nAvailable statuses:" << endl;
-    cout << "  - Interested" << endl;
-    cout << "  - Ongoing" << endl;
-    cout << "  - Finished" << endl;
-    cout << "  - Dropped" << endl;
-    cout << "  - Ended" << endl;
-    cout << "Enter status: ";
+    cout << "  1) Interested" << endl;
+    cout << "  2) Ongoing" << endl;
+    cout << "  3) Finished" << endl;
+    cout << "  4) Dropped" << endl;
+    cout << "  5) Ended" << endl;
+    cout << "  Press tab if you want to leave"<<endl;
+    cout << "Enter new status: ";
     getline(cin, status);
+    
+    if (status == "1") {
+        status = "Interested";
+    } else if (status == "2") {
+        status = "Ongoing";
+    } else if (status == "3") {
+        status = "Finished";
+    } else if (status == "4") {
+        status = "Dropped";
+    } else if (status == "5") {
+        status = "Ended";
+    } else if (status == "\t") {
+        cout << "Going back to the menu" << endl;
+        return;
+    } else {
+        
+    }
 
     // Get initial counts for each measure
     vector<string> measures = cat->getMeasures();
@@ -140,7 +175,7 @@ void addMedia(Doc& doc) {
     }
     mediaStr += "}\\\\" + status;
 
-    Media* media = doc.getRepo()->addMedia(theme, mediaStr);
+    Media* media = repo->addMedia(theme, mediaStr);
     if (media != nullptr) {
         cout << "\nMedia '" << title << "' added successfully!" << endl;
     } else {
@@ -149,7 +184,7 @@ void addMedia(Doc& doc) {
     waitForEnter();
 }
 
-void updateProgress(Doc& doc) {
+void updateProgress() {
     clearScreen();
     printHeader();
     cout << "\n--- Update Media Progress ---\n" << endl;
@@ -160,7 +195,7 @@ void updateProgress(Doc& doc) {
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     getline(cin, theme);
 
-    Category* cat = doc.getRepo()->getTheme(theme);
+    Category* cat = repo->getTheme(theme);
     if (cat == nullptr) {
         cout << "\nCategory '" << theme << "' not found!" << endl;
         waitForEnter();
@@ -170,7 +205,7 @@ void updateProgress(Doc& doc) {
     cout << "Enter media title: ";
     getline(cin, title);
 
-    Media* media = doc.getRepo()->getMedia(theme, title);
+    Media* media = repo->getMedia(theme, title);
     if (media == nullptr) {
         cout << "\nMedia '" << title << "' not found in '" << theme << "'!" << endl;
         waitForEnter();
@@ -199,13 +234,13 @@ void updateProgress(Doc& doc) {
     int amount;
     cin >> amount;
 
-    doc.getRepo()->changeMedia(theme, title, choice - 1, amount);
+    repo->changeMedia(theme, title, choice - 1, amount);
     cout << "\nProgress updated!" << endl;
     cout << "New status: " << media->print() << endl;
     waitForEnter();
 }
 
-void changeStatus(Doc& doc) {
+void changeStatus() {
     clearScreen();
     printHeader();
     cout << "\n--- Change Media Status ---\n" << endl;
@@ -219,7 +254,7 @@ void changeStatus(Doc& doc) {
     cout << "Enter media title: ";
     getline(cin, title);
 
-    Media* media = doc.getRepo()->getMedia(theme, title);
+    Media* media = repo->getMedia(theme, title);
     if (media == nullptr) {
         cout << "\nMedia not found!" << endl;
         waitForEnter();
@@ -229,15 +264,33 @@ void changeStatus(Doc& doc) {
     cout << "\nCurrent: " << media->print() << endl;
 
     cout << "\nAvailable statuses:" << endl;
-    cout << "  - Interested" << endl;
-    cout << "  - Ongoing" << endl;
-    cout << "  - Finished" << endl;
-    cout << "  - Dropped" << endl;
-    cout << "  - Ended" << endl;
+    cout << "  1) Interested" << endl;
+    cout << "  2) Ongoing" << endl;
+    cout << "  3) Finished" << endl;
+    cout << "  4) Dropped" << endl;
+    cout << "  5) Ended" << endl;
+    cout << "  Press tab if you want to leave"<<endl;
     cout << "Enter new status: ";
     getline(cin, status);
+    
+    if (status == "1") {
+        status = "Interested";
+    } else if (status == "2") {
+        status = "Ongoing";
+    } else if (status == "3") {
+        status = "Finished";
+    } else if (status == "4") {
+        status = "Dropped";
+    } else if (status == "5") {
+        status = "Ended";
+    } else if (status == "\t") {
+        cout << "Going back to the menu" << endl;
+        return;
+    } else {
+        
+    }
 
-    doc.getRepo()->status(theme, title, status);
+    repo->status(theme, title, status);
     cout << "\nStatus updated!" << endl;
     cout << "New: " << media->print() << endl;
     waitForEnter();
@@ -245,6 +298,7 @@ void changeStatus(Doc& doc) {
 
 int main() {
     Doc document;
+    repo = document.getRepo();
     int choice;
     bool running = true;
 
@@ -253,23 +307,37 @@ int main() {
         printHeader();
         printMenu();
 
-        cin >> choice;
+        do
+        {
+            string choiceStr;
+            getline(cin, choiceStr);
+            try{
+                choice = stoi(choiceStr);
+            }catch(const invalid_argument& ia){
+                cout<<"\nInvalid choice! Please try again."<<endl;
+                cin.clear();
+                choice = -1;
+            }
+        } while (choice < 1 || choice > 6);
+        
+        
+        
 
         switch (choice) {
             case 1:
-                viewAllMedia(document);
+                viewAllMedia();
                 break;
             case 2:
-                addCategory(document);
+                addCategory();
                 break;
             case 3:
-                addMedia(document);
+                addMedia();
                 break;
             case 4:
-                updateProgress(document);
+                updateProgress();
                 break;
             case 5:
-                changeStatus(document);
+                changeStatus();
                 break;
             case 6:
                 cout << "\nSaving and exiting..." << endl;
@@ -277,7 +345,7 @@ int main() {
                 break;
             default:
                 cout << "\nInvalid choice! Please try again." << endl;
-                waitForEnter();
+                //waitForEnter();
                 break;
         }
     }
