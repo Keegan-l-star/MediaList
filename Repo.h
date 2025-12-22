@@ -21,6 +21,7 @@ class Repo{
         std::string print();
         void changeMedia(std::string theme, std::string text,int index, int No);
         void status(std::string theme, std::string text, std::string status);
+        std::string view();
         std::string symbol(std::string symbol);
 
 };

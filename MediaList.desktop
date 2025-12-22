@@ -1,5 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=MediaList
-Exec=gnome-terminal -- bash -c "cd /workspaces/MediaList && ./list; read -p \"Press Enter to close...\""
-Terminal=false

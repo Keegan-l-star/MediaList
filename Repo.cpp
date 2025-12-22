@@ -168,6 +168,14 @@ std::string Repo::print(){
     return result;
 }
 
+std::string Repo::view(){
+    std::string result;
+    for(auto cat : content){
+        result+=cat->view();
+    }
+    return result;
+}
+
 void Repo::changeMedia(std::string theme, std::string text,int index, int No){
     Media* media = getMedia(theme, text);
     if(media==nullptr){
