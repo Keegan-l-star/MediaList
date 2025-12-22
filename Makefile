@@ -32,12 +32,21 @@ $(MAIN): List.o $(COMMON_OBJS)
 all: $(TARGET) $(MAIN)
 
 # Convenience targets
-.PHONY: all Testing run vt gdb clean
+.PHONY: all Testing run vt gdb clean desktop
 
 Testing: $(TARGET)
 
 run: $(TARGET)
 	./$(TARGET)
+
+desktop: $(MAIN)
+	@echo '[Desktop Entry]' > MediaList.desktop
+	@echo 'Type=Application' >> MediaList.desktop
+	@echo 'Name=MediaList' >> MediaList.desktop
+	@echo 'Exec=gnome-terminal -- bash -c "cd $(CURDIR) && ./$(MAIN); read -p \"Press Enter to close...\""' >> MediaList.desktop
+	@echo 'Terminal=false' >> MediaList.desktop
+	@chmod +x MediaList.desktop
+	@echo "Created MediaList.desktop - you can double-click it to run the program"
 
 vt: $(TARGET)
 	$(VAL) $(VGFLAGS) ./$(TARGET) $(ARGS)
