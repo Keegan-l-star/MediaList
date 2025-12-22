@@ -2,13 +2,14 @@
 CXX := g++
 CXXFLAGS := -std=c++11 -g
 
-## Output executable
+## Output executables
 TARGET := test
+MAIN := list
 
 ## Source layout
 SRC_ALL := $(wildcard *.cpp)
 # Exclude main and test sources from common object list
-COMMON_SRCS := $(filter-out Main.cpp test.cpp,$(SRC_ALL))
+COMMON_SRCS := $(filter-out List.cpp test.cpp,$(SRC_ALL))
 COMMON_OBJS := $(COMMON_SRCS:.cpp=.o)
 
 ## Valgrind settings
@@ -23,8 +24,12 @@ VGFLAGS := --leak-check=full --show-leak-kinds=all --track-origins=yes --errors-
 $(TARGET): test.o $(COMMON_OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
+## Link main program with UI
+$(MAIN): List.o $(COMMON_OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
 ## Default target
-all: $(TARGET)
+all: $(TARGET) $(MAIN)
 
 # Convenience targets
 .PHONY: all Testing run vt gdb clean
