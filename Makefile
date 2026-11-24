@@ -1,6 +1,6 @@
 ## Compiler and flags
 CXX := g++
-CXXFLAGS := -std=c++11 -g
+CXXFLAGS := -std=c++17 -g
 
 ## Output executables
 TARGET := test
@@ -22,7 +22,7 @@ VGFLAGS := --leak-check=full --show-leak-kinds=all --track-origins=yes --errors-
 
 ## Link test binary (depends on test.o and common objects)
 $(TARGET): test.o $(COMMON_OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lgtest -lgtest_main -pthread
 
 ## Link main program with UI
 $(MAIN): List.o $(COMMON_OBJS)
