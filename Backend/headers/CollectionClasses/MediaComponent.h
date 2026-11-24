@@ -1,0 +1,5 @@
+#ifndef MEDIACOMPONENT_H
+#define MEDIACOMPONENT_H
+
+#endif
+

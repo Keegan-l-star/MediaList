@@ -51,7 +51,7 @@ Category* Repo::addTheme(std::string text){
 Category* Repo::addTheme(std::string title, std::string symbol, std::vector<std::string> measures){
     Category* category = new Category(title, symbol, measures);
     for(auto cat : content){
-        if(cat->cat(title)!=nullptr){
+        if(cat->search(title)!=nullptr){
             std::cout<<"Category already exists"<<std::endl;
             std::cout<<"Please use a different title for the new category."<<std::endl;
             delete category;
@@ -70,7 +70,7 @@ Category* Repo::addTheme(std::string title, std::string symbol, std::vector<std:
 
 Category* Repo::getTheme(std::string title){
     for(auto cat : content){
-        Category* catPtr = cat->cat(title);
+        Category* catPtr = cat->search(title);
         if(catPtr!=nullptr){
             return catPtr;
         }
