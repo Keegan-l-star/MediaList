@@ -1,6 +1,6 @@
 ## Compiler and flags
 CXX := g++
-CXXFLAGS := -std=c++11 -g
+CXXFLAGS := -std=c++17 -g
 
 ## Output executables
 TARGET := test
